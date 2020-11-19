@@ -1,0 +1,28 @@
+[
+  {
+    "type": "trunk",
+    "children": [
+      {
+        "type": "leaf",
+        "name": "hello I am a leaf"
+      },
+      {
+        "type": "leaf",
+        "name": "hello I am a second leaf"
+      },
+      {
+        "type": "trunk",
+        "children": [
+          {
+            "type": "leaf",
+            "name": "hello I am a grand leaf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "leaf",
+    "name": "hello I am the mother of all leaf"
+  }
+]
