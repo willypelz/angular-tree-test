@@ -1,92 +1,19 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
-import {Component, Injectable} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
-import {BehaviorSubject} from 'rxjs';
-import * as data from './response.json';
+import TreeItemFlatNode from './model/tree-item-flat-node';
+import TreeDatabase from './service/data-formatter';
+import TreeItemNode from './model/tree-item-node';
 
 
-/**
- * Node for to-do item
- */
-export class TreeItemNode {
-  children: TreeItemNode[];
-  item: string;
-}
-
-/** Flat to-do item node with expandable and level information */
-export class TreeItemFlatNode {
-  item: string;
-  level: number;
-  expandable: boolean;
-}
-
-/**
- * The Json object for to-do list data.
- */
-const TREE_API_DATA = data;
-
-
-/**
- * Checklist database, it can build a tree structured Json object.
- * Each node in Json object represents a to-do item or a category.
- * If a node is a category, it has children items and new items can be added under the category.
- */
-@Injectable()
-export class ChecklistDatabase {
-  dataChange = new BehaviorSubject<TreeItemNode[]>([]);
-
-  get data(): TreeItemNode[] { return this.dataChange.value; }
-
-  constructor() {
-    this.initialize();
-  }
-
-  initialize() {
-    // Build the tree nodes from Json object. The result is a list of `TreeItemNode` with nested
-    //     file node as children.
-    const data = this.buildFileTree(TREE_API_DATA, 0);
-
-    // Notify the change.
-    this.dataChange.next(data);
-  }
-
-  /**
-   * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
-   * The return value is the list of `TreeItemNode`.
-   */
-  buildFileTree(obj: {[key: string]: any}, level: number): TreeItemNode[] {
-    return Object.keys(obj).reduce<TreeItemNode[]>((accumulator, key) => {
-      let value = obj[key];
-      const node = new TreeItemNode();
-      node.item = value.type;
-      delete value.type;
-
-
-      if (value != null) {
-        if (typeof value === 'object') {
-          node.children = this.buildFileTree(value, level + 1);
-          if (!node.item) node.item = 'trunk'
-        } else {
-          node.item = value;
-        }
-      }
-
-      return accumulator.concat(node);
-    }, []);
-  }
-}
-
-/**
- * @title Tree with checkboxes
- */
 @Component({
   selector: 'tree-list',
   templateUrl: 'tree-list.html',
   styleUrls: ['tree-list.css'],
-  providers: [ChecklistDatabase]
+  providers: [TreeDatabase]
 })
-export class TreeList {
+export class TreeList extends TreeDatabase {
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap = new Map<TreeItemFlatNode, TreeItemNode>();
 
@@ -105,10 +32,11 @@ export class TreeList {
 
   dataSource: MatTreeFlatDataSource<TreeItemNode, TreeItemFlatNode>;
 
-  /** The selection for checklist */
-  checklistSelection = new SelectionModel<TreeItemFlatNode>(true /* multiple */);
+  /** The selection for TreeList */
+  treeListSelection = new SelectionModel<TreeItemFlatNode>(true /* multiple */);
 
-  constructor(private _database: ChecklistDatabase) {
+  constructor(private _database: TreeDatabase) {
+    super();
     this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
       this.isExpandable, this.getChildren);
     this.treeControl = new FlatTreeControl<TreeItemFlatNode>(this.getLevel, this.isExpandable);
