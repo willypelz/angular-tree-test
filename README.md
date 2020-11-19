@@ -1,6 +1,7 @@
-# Test
+# Angular Tree Test
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.2.
+An instance of TreeFlattener is used to generate a flat list of items from hierarchical data. The "level" of each tree node is read through the getLevel method.
+
 
 ## Development server
 
