@@ -1,0 +1,20 @@
+<h3>Dynamic listing for tree base on Api response</h3>
+<mat-divider></mat-divider>
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
+    <button mat-icon-button disabled></button>
+    <mat-icon>last_page</mat-icon>
+    <mat-chip-list>{{node.item}}</mat-chip-list>
+  </mat-tree-node>
+
+  <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+    <button mat-icon-button matTreeNodeToggle
+            [attr.aria-label]="'Toggle ' + node.item">
+      <mat-icon class="mat-icon-rtl-mirror">
+        {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+      </mat-icon>
+    </button>
+    <span [matBadge]="node.level + 1" matBadgeSize="small" matBadgeOverlap="false">{{node.item}} </span>
+<!--    <mat-chip-list>{{node | json}}</mat-chip-list>-->
+  </mat-tree-node>
+</mat-tree>
